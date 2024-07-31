@@ -4,7 +4,7 @@ import {
   reserve_ticket_schema,
   cancel_ticket_schema,
 } from "../helper.ts/schema";
-import CUSTOMERS from "../model/dbcustomers";
+import users from "../model/dbusers";
 import CUSTOEMER_TICKET from "../model/dbcustomerticket";
 import general_ticket_obj from "../model/general_ticket";
 import {
@@ -183,7 +183,7 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
 
     const insert_customer_response = await Promise.all(
       validate.customers.map(({ first_name, last_name, dob }: any) => {
-        return CUSTOMERS.insert_customers({
+        return users.insertUser({
           first_name,
           last_name,
           dob: formatDateString(dob, "YYYY-MM-DD HH:mm:ss"),

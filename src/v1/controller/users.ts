@@ -8,11 +8,16 @@ import {
 import { applyValidation } from "../helper.ts/validation";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { create_random_token } from "../helper.ts/helpfn";
+import {
+  create_random_token,
+  send_otp,
+  formatDateString,
+} from "../helper.ts/helpfn";
 import user from "../model/dbusers";
 import html_template from "../helper.ts/html";
-import { send_mail } from "../helper.ts/helpfn";
+import { send_mail, generateOTP } from "../helper.ts/helpfn";
 import crypto from "crypto";
+import { date } from "joi";
 const signToken = (id: any) =>
   jwt.sign({ id }, process.env.JWT_SECRET || "90d", {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -47,15 +52,148 @@ const signToken = (id: any) =>
 //   }
 // };
 
-export const signup_test = async (req: Request, res: Response) => {
+export const signup_otp = async (req: Request, res: Response) => {
   try {
-    console.log(req.body);
+    const validate = await applyValidation(forgot_password_schema, req.body);
+    const { email } = validate;
+    const db_user = await user.getUser({ email });
+    if (db_user.length > 0) {
+      const { password = null } = db_user[0];
+      if (password) {
+        throw {
+          message: "this email is already registered with us",
+        };
+      }
+
+      const { otp_expiry } = db_user[0];
+      // otp is not null and it is not expired yet
+      if (otp_expiry && new Date(otp_expiry) > new Date()) {
+        // resend the same otp
+        const { otp } = db_user[0];
+        const mailResponse = await send_otp(otp, email);
+        res.status(200).json({
+          error: false,
+          message: "a six digit otp has been sended to your email",
+          data: { otp },
+        });
+      }
+
+      // otp is not null and expired
+
+      if (otp_expiry && new Date(otp_expiry) < new Date()) {
+        // resend new otp and set new expiry time
+        const otp = generateOTP();
+        const newExpirytime = formatDateString(
+          new Date(Date.now() + 10 * 60 * 1000),
+          "YYYY-MM-DD HH:mm:ss"
+        );
+        const { id } = db_user[0];
+        const response = await user.update_user(id, {
+          otp_expiry: newExpirytime,
+          otp,
+        });
+        if (!response) {
+          throw { message: "error is coming from update_user" };
+        }
+        const mailResponse = await send_otp(otp, email);
+        res.status(200).json({
+          error: false,
+          message: "a six digit otp has been sended to your email",
+          data: { otp },
+        });
+      }
+    }
+    const otp = generateOTP();
+    const newExpirytime = formatDateString(
+      new Date(Date.now() + 10 * 60 * 1000),
+      "YYYY-MM-DD HH:mm:ss"
+    );
+    const inserUser_response = await user.insertUser({
+      email,
+      otp,
+      otp_expiry: newExpirytime,
+    });
+    if (!inserUser_response) {
+      throw { message: "error is coming from insertUser method" };
+    }
+    const mailResponse = await send_otp(otp, email);
+
     res.status(200).json({
       error: false,
-      message: "you have signup successfully",
-      data: req.body,
+      message: "a six digit otp has been sended to your email",
+      data: { otp },
     });
-  } catch (error) {}
+  } catch (error) {
+    const err = error as any;
+    res.status(400).json({
+      error: true,
+      message: err.message,
+      data: {},
+    });
+  }
+};
+
+export const verify_otp = async (req: Request, res: Response) => {
+  try {
+    const validate = await applyValidation(signupSchema, req.body);
+    const db_user = await user.getUser({ email: validate.email });
+    if (db_user.length === 0) {
+      throw { message: "user not found" };
+    }
+    const { otp: dbotp, otp_expiry } = db_user[0];
+
+    if (new Date(otp_expiry) < new Date()) {
+      throw {
+        message: "otp has been expire",
+      };
+    }
+
+    if (validate.otp !== dbotp) {
+      throw {
+        message: "Incorrect otp",
+      };
+    }
+
+    const {
+      firstName: firstname,
+      lastName: lastname,
+      password,
+      email,
+      mobile,
+    } = validate;
+    const id = db_user[0].id;
+    const hashed_password = await bcrypt.hash(password, 12);
+    const updateUser = await user.update_user(id, {
+      firstname,
+      lastname,
+      password: hashed_password,
+      email,
+      mobile,
+      otp: null,
+      otp_expiry: null,
+    });
+    if (!updateUser) {
+      throw {
+        message: "error is coming from update_user",
+      };
+    }
+    const token = signToken(id);
+
+    res.status(200).json({
+      error: false,
+      message: "user is signup successfully",
+      data: {
+        token,
+      },
+    });
+  } catch (error) {
+    const err = error as any;
+    res.status(200).json({
+      error: true,
+      message: err.message,
+      data: {},
+    });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {

@@ -27,7 +27,7 @@ export class dbusers extends appdb {
     }
     return where;
   }
-  async insertUser(userObj: signup_user) {
+  async insertUser(userObj: any) {
     try {
       return await this.insertRecord(userObj);
     } catch (error) {

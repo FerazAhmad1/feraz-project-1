@@ -1,10 +1,11 @@
 import express from "express";
 import {
-  signup_test,
+  signup_otp,
   login,
   update_role,
   forgot_password,
   reset_password,
+  verify_otp,
 } from "../controller/users";
 import { validate_body } from "../helper.ts/helpfn";
 import { signupSchema } from "../helper.ts/schema";
@@ -12,7 +13,8 @@ import { protect, restrict_to } from "../helper.ts/helpfn";
 
 const router = express.Router();
 console.log("I am auth router running");
-router.post("/signup", validate_body(signupSchema), signup_test);
+router.post("/signup", signup_otp);
+router.post("/verifyotp", verify_otp);
 router.post("/login", login);
 router.post("/approoverole", protect, restrict_to("user"), update_role);
 router.post("/forgotpassword", forgot_password);

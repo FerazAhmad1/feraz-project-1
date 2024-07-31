@@ -5,14 +5,14 @@ import moment from "moment";
 
 // Define a custom date format validation schema using Joi's custom method
 const person_schema = joi.object({
-  first_name: joi
+  firstname: joi
     .string()
     .trim()
     .min(3)
     .max(255)
     .pattern(/^[A-Za-z]+$/)
     .required(),
-  last_name: joi
+  lastname: joi
     .string()
     .trim()
     .min(3)
@@ -73,6 +73,13 @@ export const signupSchema = joi.object({
     .length(10)
     .required(),
   email: joi.string().trim().email().required(),
+  otp: joi
+    .string()
+    .trim()
+    .length(6)
+    .pattern(/^[0-9]+$/)
+    .required(),
+  role: joi.string().trim().valid("user").required(),
   password: joi.string().trim().min(8).required(),
 });
 

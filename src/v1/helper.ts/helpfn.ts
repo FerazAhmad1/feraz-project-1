@@ -8,6 +8,7 @@ import { rate_train_one, rate_train_two, rate_train_three } from "../constants";
 import { getPreciseDistance } from "geolib";
 import moment from "moment";
 import { applyValidation } from "./validation";
+import html_template from "./html";
 
 interface CustomRequest extends Request {
   user?: {
@@ -262,4 +263,30 @@ export const validate_body = (schema: any) => {
       });
     }
   };
+};
+
+export const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+export const send_otp = async (otp: any, reciever: any) => {
+  try {
+    let html = html_template.replace(
+      "REPLACE_WITH_HTML_CONTENT",
+      `<p>this is your six digit otp . ${otp}  </p>`
+    );
+    html = html.replace("REPLACE_WITH_LINK", "");
+    html = html.replace("REPLACE_WITH_TAB", "");
+    const subject = "otp";
+    const sender = "feraz@gmail.com";
+    const mail_response = await send_mail({
+      html,
+      sender,
+      subject,
+      reciever,
+    });
+    return mail_response;
+  } catch (error) {
+    throw error;
+  }
 };
