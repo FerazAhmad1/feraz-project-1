@@ -188,6 +188,7 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
         return users.insertUser({
           firstname,
           lastname,
+          role: "customer",
           dob: formatDateString(dob, "YYYY-MM-DD HH:mm:ss"),
         });
       })
