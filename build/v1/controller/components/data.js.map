@@ -1,1 +1,0 @@
-{"version":3,"file":"data.js","sourceRoot":"/","sources":["v1/controller/components/data.ts"],"names":[],"mappings":";;AACA,MAAa,IAAI;CAChB;AADD,oBACC","sourcesContent":["\nexport class data {\n}"]}

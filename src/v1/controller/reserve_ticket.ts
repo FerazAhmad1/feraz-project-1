@@ -56,9 +56,9 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
 
     const train_id = train.id;
 
-    const find_schedule_for_source = `select id, stop_order,minutes from schedule where station_id = '${source_station_id}' AND train_id = '${train_id}' `;
+    const find_schedule_for_source = `select id, stop_order,minutes_required_to_reach_from_source_station from schedule where station_id = '${source_station_id}' AND train_id = '${train_id}' `;
 
-    const find_schedule_for_destination = `select id, stop_order,minutes from schedule where station_id = '${destination_station_id}' AND train_id = '${train_id}' `;
+    const find_schedule_for_destination = `select id, stop_order,minutes_required_to_reach_from_source_station from schedule where station_id = '${destination_station_id}' AND train_id = '${train_id}' `;
     const [[source_schedule], [destination_schedule]] = await Promise.all([
       reservation.executeQuery(find_schedule_for_source),
       reservation.executeQuery(find_schedule_for_destination),
@@ -84,7 +84,8 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
 
     // make response
     const train_start_time = train.start_time;
-    const source_minute = source_schedule.minutes;
+    const source_minute =
+      source_schedule.minutes_required_to_reach_from_source_station;
 
     const train_date = validateDay(
       train.days,
@@ -128,7 +129,8 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
       formated_train_date
     );
 
-    const destination_minutes = destination_schedule.minutes * 1;
+    const destination_minutes =
+      destination_schedule.minutes_required_to_reach_from_source_station * 1;
 
     const [start_d_j, arrival_time_at_source_station] = create_date(
       train_date,
@@ -182,10 +184,10 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
     // insert customers in customer table
 
     const insert_customer_response = await Promise.all(
-      validate.customers.map(({ first_name, last_name, dob }: any) => {
+      validate.customers.map(({ firstname, lastname, dob }: any) => {
         return users.insertUser({
-          first_name,
-          last_name,
+          firstname,
+          lastname,
           dob: formatDateString(dob, "YYYY-MM-DD HH:mm:ss"),
         });
       })

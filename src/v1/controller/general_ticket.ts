@@ -52,7 +52,7 @@ export const create_general_ticket = async (req: Request, res: Response) => {
       agentid: (req as CustomRequest).user.id,
       source_stn: from_station.id * 1,
       destination_stn: to_staion.id * 1,
-      time: right_now,
+      date_time: right_now,
       quantity: validate.quantity,
     });
 

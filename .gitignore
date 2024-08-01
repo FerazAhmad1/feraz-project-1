@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-/build
+build
 tslint.json
 .env
 
@@ -42,4 +42,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-.editorconfig
+.editorconfigbuild/
+node_modules/

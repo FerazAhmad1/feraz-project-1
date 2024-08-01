@@ -1,1 +1,0 @@
-{"version":3,"file":"appdb.js","sourceRoot":"/","sources":["v1/model/appdb.ts"],"names":[],"mappings":";;AAAA,sCAAmC;AAEnC,MAAa,KAAM,SAAQ,OAAE;IAC5B;QACC,KAAK,EAAE,CAAC;IACT,CAAC;CACD;AAJD,sBAIC","sourcesContent":["import { db } from \"../library/db\";\n\nexport class appdb extends db {\n\tconstructor() {\n\t\tsuper();\n\t}\n}\n"]}
