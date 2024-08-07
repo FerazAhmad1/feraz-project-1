@@ -1,9 +1,7 @@
 import joi from "joi";
 import moment from "moment";
 
-// const moment = require('moment');
 
-// Define a custom date format validation schema using Joi's custom method
 const person_schema = joi.object({
   firstname: joi
     .string()
@@ -89,8 +87,8 @@ export const login_schema = joi.object({
 });
 
 export const reserve_ticket_schema = joi.object({
-  from: joi.string().min(2).max(255).required(),
-  to: joi.string().min(2).max(255).required(),
+  from_id: joi.string().max(255).required(),
+  to_id: joi.string().max(255).required(),
   startdate: customDateFormat.required(),
   trainnumber: joi
     .string()
@@ -130,6 +128,7 @@ export const forgot_password_schema = joi.object({
 });
 
 export const reset_password_schema = joi.object({
+  email: joi.string().trim().email().required(),
   password: joi.string().trim().min(8).max(255).required(),
 });
 
@@ -143,3 +142,15 @@ export const general_ticket_schema = joi.object({
 export const cancel_ticket_schema = joi.object({
   pnr: joi.string().length(10).required(),
 });
+
+
+export const search_station_schema = joi.object({
+  station_name_or_code: joi.string().min(2).max(255).required(),
+  page: joi.string().pattern(/^[1-9]\d*$/).default("1").required()
+
+})
+
+
+export const get_all_ticket_schema = joi.object({
+  page: joi.string().pattern(/^[1-9]\d*$/).default("1").required()
+})

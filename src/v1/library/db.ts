@@ -13,7 +13,7 @@ export class db {
   public url: string = "";
   public totalRecords: number = 0;
 
-  constructor() {}
+  constructor() { }
 
   /**
    * This function will execute given Query with checking of DB connection. It will return appropriate type of response in case of insert, update, delete, select etc.
@@ -55,24 +55,8 @@ export class db {
    * @param limit limit of DB records required
    * @returns array
    */
-  select(
-    table: string,
-    fields: string,
-    where: string,
-    orderby: string,
-    limit: string
-  ) {
-    let query =
-      "SELECT " +
-      fields +
-      " FROM " +
-      table +
-      " " +
-      where +
-      " " +
-      orderby +
-      " " +
-      limit;
+  select(table: string, fields: string, where: string, orderby: string, limit: string) {
+    let query = "SELECT " + fields + " FROM " + table + " " + where + " " + orderby + " " + limit;
     console.log("fffffffffffffffffff", query);
     return this.executeQuery(query);
   }
@@ -87,25 +71,25 @@ export class db {
     let valuesArray: any = new Array();
 
     for (let key in data) {
+
       columnsArray.push(key);
       valuesArray.push(data[key]);
+
     }
+
     let columns: string = columnsArray.join(",");
 
     for (let i = 0; i < valuesArray.length; i++) {
+
       valuesArray[i] = String(valuesArray[i]);
+
       valuesArray[i] = valuesArray[i].replace(/'/g, "''");
     }
+
     let values: string = valuesArray.join("','");
 
-    let query =
-      "INSERT INTO " +
-      table +
-      "(" +
-      columns +
-      ") values('" +
-      values +
-      "') RETURNING id";
+    let query = "INSERT INTO " + table + "(" + columns + ") values('" + values + "') RETURNING id";
+
     return this.executeQuery(query);
   }
 
@@ -122,12 +106,14 @@ export class db {
       if (updatestring !== "") {
         updatestring += ",";
       }
+
       if (data[key] == null) {
         updatestring += key + "=''";
       } else {
         data[key] = String(data[key]);
         updatestring += key + "='" + data[key].replace(/'/g, "''") + "'";
       }
+
     }
 
     let query = "UPDATE " + table + " SET " + updatestring + " " + where;
@@ -150,13 +136,7 @@ export class db {
    * @param fields DB fields
    */
   selectRecord(id: number, fields = "*") {
-    return this.select(
-      this.table,
-      fields,
-      "WHERE " + this.uniqueField + " = " + id,
-      this.orderby,
-      this.limit
-    );
+    return this.select(this.table, fields, "WHERE " + this.uniqueField + " = " + id, this.orderby, this.limit);
   }
 
   /**
@@ -195,13 +175,7 @@ export class db {
   async listRecords(fields = "*") {
     console.log("ttttttttttttt", this.where);
     let start = (this.page - 1) * this.rpp;
-    let result = await this.select(
-      this.table,
-      fields,
-      this.where,
-      this.orderby,
-      "LIMIT " + this.rpp + " OFFSET " + start
-    );
+    let result = await this.select(this.table, fields, this.where, this.orderby, "LIMIT " + this.rpp + " OFFSET " + start);
     return !result ? [] : result;
   }
 
@@ -210,13 +184,7 @@ export class db {
    * @param fields fields
    */
   async allRecords(fields = "*") {
-    let result = await this.select(
-      this.table,
-      fields,
-      this.where,
-      this.orderby,
-      ""
-    );
+    let result = await this.select(this.table, fields, this.where, this.orderby, "");
     return !result ? [] : result;
   }
 
@@ -227,8 +195,7 @@ export class db {
    * @param where where condition
    */
   async selectCount(table: string, uniqueField: string, where: string) {
-    let query: string =
-      "SELECT count(" + uniqueField + ") as cnt FROM " + table + " " + where;
+    let query: string = "SELECT count(" + uniqueField + ") as cnt FROM " + table + " " + where;
     let result: any[] = await this.executeQuery(query);
     return result.length > 0 ? result[0].cnt : 0;
   }
@@ -237,11 +204,7 @@ export class db {
    * Get total pages of records with given condition and given rpp.
    */
   async getTotalPages() {
-    this.totalRecords = await this.selectCount(
-      this.table,
-      this.uniqueField,
-      this.where
-    );
+    this.totalRecords = await this.selectCount(this.table, this.uniqueField, this.where);
     let totalpages: number = Math.ceil(this.totalRecords / this.rpp);
     return totalpages;
   }
