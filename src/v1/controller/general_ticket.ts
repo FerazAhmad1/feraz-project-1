@@ -4,7 +4,7 @@ import general_ticket_obj from "../model/general_ticket";
 
 
 
-export const create_general_ticket = async (req: Request, res: Response) => {
+export const create_general_ticket = async function (req: Request, res: Response) {
   try {
     const user = req.body.__user
     const response = await general_ticket_obj.create_general_ticket(req.body, user);

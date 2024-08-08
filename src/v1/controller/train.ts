@@ -4,7 +4,7 @@ import train_obj from "../model/traindb";
 
 
 
-export const search_train = async (req: Request, res: Response) => {
+export const search_train = async function (req: Request, res: Response) {
   try {
 
     const validate = req.body

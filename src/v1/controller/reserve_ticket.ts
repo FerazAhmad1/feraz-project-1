@@ -2,10 +2,9 @@ import { Request, Response } from "express";
 import reservation from "../model/dbreservetickets";
 
 
-export const create_reserve_ticket = async (req: Request, res: Response) => {
-  console.log("fffffffffffffffffffffffffffffffffffffffffffffff")
+export const create_reserve_ticket = async function (req: Request, res: Response) {
   try {
-    console.log("req.bodyRRRRRRRRRRRRRRRRRRRRRRRRRRR", req.body)
+
     const response = await reservation.ticket_reservation(req.body, req.body.__user);
     if (!response || response.error) {
       throw {
@@ -24,7 +23,7 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
   }
 };
 
-export const get_all_ticket = async (req: Request, res: Response) => {
+export const get_all_ticket = async function (req: Request, res: Response) {
   try {
     let { page } = req.body
     page = page * 1
@@ -48,7 +47,7 @@ export const get_all_ticket = async (req: Request, res: Response) => {
   }
 };
 
-export const cancel_ticket = async (req: Request, res: Response) => {
+export const cancel_ticket = async function (req: Request, res: Response) {
   try {
     const user = req.body.__user;
     const validate = req.body

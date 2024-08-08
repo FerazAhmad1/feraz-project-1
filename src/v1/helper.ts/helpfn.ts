@@ -12,7 +12,7 @@ import html_template from "./html";
 
 
 
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
+export const protect = async function (req: Request, res: Response, next: NextFunction) {
   try {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
@@ -49,7 +49,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export const create_date = (date: any, time: string, minutes_to_add: number) => {
+export const create_date = function (date: any, time: string, minutes_to_add: number) {
   console.log(date, time, minutes_to_add);
   // Create the initial date object from dateStr
   const initialDate = new Date(date);
@@ -77,7 +77,7 @@ export const create_date = (date: any, time: string, minutes_to_add: number) => 
   return [formatedDate, formatedTime];
 };
 
-export const check_timeLimit = (dateStr: any, timeStr: any) => {
+export const check_timeLimit = function (dateStr: any, timeStr: any) {
   try {
     const initialDate: any = new Date(dateStr);
     const [hours, minutes, seconds] = timeStr.split(":").map(Number);
@@ -105,7 +105,7 @@ export const check_timeLimit = (dateStr: any, timeStr: any) => {
   }
 };
 
-export const restrict_to = (...allowed: any[]) => {
+export const restrict_to = function (...allowed: any[]) {
   console.log();
   return (req: any, res: any, next: NextFunction) => {
     if (allowed.includes(req.user.role)) {
@@ -120,7 +120,7 @@ export const restrict_to = (...allowed: any[]) => {
   };
 };
 
-export const calculate_amount = (train_id: any, num_of_customers: any, minutes: any) => {
+export const calculate_amount = function (train_id: any, num_of_customers: any, minutes: any) {
 
   let rate = 4;
   let id = train_id * 1;
@@ -137,7 +137,7 @@ export const calculate_amount = (train_id: any, num_of_customers: any, minutes: 
   return amount;
 };
 
-export const validateDay = (days: string, date: string, start_time: string, total_minute: number) => {
+export const validateDay = function (days: string, date: string, start_time: string, total_minute: number) {
 
   console.log(days, date, start_time, total_minute);
   let initialDate = new Date(date);
@@ -161,9 +161,9 @@ export const validateDay = (days: string, date: string, start_time: string, tota
   return false;
 };
 
-export const formatDateString = (dateString: Date, pattern: string): string => moment(dateString).format(pattern);
+export const formatDateString = function (dateString: Date, pattern: string) { return moment(dateString).format(pattern); }
 
-export const send_mail = async ({ reciever, html, subject, sender }: any) => {
+export const send_mail = async function ({ reciever, html, subject, sender }: any) {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST || "smtp.gmail.com",
@@ -189,7 +189,7 @@ export const send_mail = async ({ reciever, html, subject, sender }: any) => {
 };
 
 
-export const create_random_token = () => {
+export const create_random_token = function () {
 
   const random_token = crypto.randomBytes(32).toString("hex");
 
@@ -198,12 +198,12 @@ export const create_random_token = () => {
   return [random_token, hashed_token];
 };
 
-export const calculate_distance = (p1: any, p2: any) => {
+export const calculate_distance = function (p1: any, p2: any) {
   const distance = getPreciseDistance(p1, p2, 1);
   return distance;
 };
 
-export const calculate_general_amount = (train_type: string, distance: any, quantity = 1) => {
+export const calculate_general_amount = function (train_type: string, distance: any, quantity = 1) {
   let rate = 0.4;
   if (train_type === "SF") {
     rate = 0.5;
@@ -215,7 +215,7 @@ export const calculate_general_amount = (train_type: string, distance: any, quan
   return amount;
 };
 
-export const validate_body = (schema: any) => {
+export const validate_body = function (schema: any) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validate = await applyValidation(schema, req.body);
@@ -234,10 +234,10 @@ export const validate_body = (schema: any) => {
   };
 };
 
-export const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+export const generateOTP = function () { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
 
-export const send_otp = async (otp: any, reciever: any) => {
+export const send_otp = async function (otp: any, reciever: any) {
   try {
     let html = html_template.replace(
       "REPLACE_WITH_HTML_CONTENT",
@@ -260,7 +260,7 @@ export const send_otp = async (otp: any, reciever: any) => {
 };
 
 
-export const create_insert_many_query = (table: string, data: any[]) => {
+export const create_insert_many_query = function (table: string, data: any[]) {
   const column = Object.keys(data[0]);
   const columnNames = column.join(',')
 
@@ -281,7 +281,8 @@ export const create_insert_many_query = (table: string, data: any[]) => {
   return query
 }
 
-export const signToken = (id: any) =>
-  jwt.sign({ id }, process.env.JWT_SECRET || "90d", {
+export const signToken = function (id: any) {
+  return jwt.sign({ id }, process.env.JWT_SECRET || "90d", {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+}

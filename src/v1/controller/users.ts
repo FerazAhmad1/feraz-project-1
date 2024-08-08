@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import user from "../model/dbusers";
 
-export const signup_otp = async (req: Request, res: Response) => {
+export const signup_otp = async function (req: Request, res: Response) {
   try {
     const response = await user.signup_otp(req.body)
     if (!response || response.error) {
@@ -20,7 +20,7 @@ export const signup_otp = async (req: Request, res: Response) => {
   }
 };
 
-export const verify_otp = async (req: Request, res: Response) => {
+export const verify_otp = async function (req: Request, res: Response) {
   try {
     const response = await user.verifyotp(req.body)
     if (!response || response.error) {
@@ -39,7 +39,7 @@ export const verify_otp = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async function (req: Request, res: Response) {
   try {
     const response = await user.login(req.body)
     if (!response || response.error) {
@@ -58,7 +58,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const update_role = async (req: any, res: Response) => {
+export const update_role = async function (req: any, res: Response) {
   try {
 
     const response = await user.update_role(req.body, req.user);
@@ -79,7 +79,7 @@ export const update_role = async (req: any, res: Response) => {
   }
 };
 
-export const forgot_password = async (req: Request, res: Response) => {
+export const forgot_password = async function (req: Request, res: Response) {
   try {
     const host = req.get("host");
     const protocol = req.protocol
@@ -101,7 +101,7 @@ export const forgot_password = async (req: Request, res: Response) => {
 };
 
 
-export const reset_password = async (req: Request, res: Response) => {
+export const reset_password = async function (req: Request, res: Response) {
   try {
     const token = req.params.token;
     const password = req.body.password;
