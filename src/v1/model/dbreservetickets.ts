@@ -29,23 +29,9 @@ class dbreservetickets extends appdb {
   }
 
 
-  async insert_reserve_ticket(data: any) {
-    try {
 
-      return await this.insertRecord(data);
-    } catch (error) {
-      throw error;
-    }
-  }
 
-  async update_reserve_ticket(id: any, data: any) {
-    try {
 
-      return await this.updateRecord(id, data);
-    } catch (error) {
-      throw error;
-    }
-  }
 
   async get_rserve_ticket(data: reserve_ticket_type) {
     const { uniquefield, uniquefieldname, field } = data
@@ -195,7 +181,7 @@ class dbreservetickets extends appdb {
       };
 
 
-      const reservation_ticket_id = await this.insert_reserve_ticket(ticket_entry_data);
+      const reservation_ticket_id = await this.insertRecord(ticket_entry_data);
 
 
 
@@ -272,7 +258,7 @@ class dbreservetickets extends appdb {
       let response;
 
       if (user.role === "railway") {
-        const response = await this.update_reserve_ticket(ticket[0].id, {
+        const response = await this.updateRecord(ticket[0].id, {
           status: "0",
         });
 
@@ -288,7 +274,7 @@ class dbreservetickets extends appdb {
           message: "you ca not cancel other's ticket",
         };
       } else {
-        const response = await this.update_reserve_ticket(ticket[0].id, {
+        const response = await this.updateRecord(ticket[0].id, {
           status: 0,
         });
         if (!response) {
