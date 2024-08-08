@@ -3,7 +3,9 @@ import reservation from "../model/dbreservetickets";
 
 
 export const create_reserve_ticket = async (req: Request, res: Response) => {
+  console.log("fffffffffffffffffffffffffffffffffffffffffffffff")
   try {
+    console.log("req.bodyRRRRRRRRRRRRRRRRRRRRRRRRRRR", req.body)
     const response = await reservation.ticket_reservation(req.body, req.body.__user);
     if (!response || response.error) {
       throw {
@@ -13,6 +15,7 @@ export const create_reserve_ticket = async (req: Request, res: Response) => {
     res.status(200).json(response)
   } catch (error) {
     const err = error as any;
+    console.log(err)
     res.status(400).json({
       error: true,
       message: err.message || "UNEXPECTED ERROR",

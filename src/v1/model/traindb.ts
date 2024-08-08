@@ -11,12 +11,13 @@ interface train {
 class traindb extends appdb {
   constructor() {
     super();
+    this.table = "train"
   }
 
   async get_train(train_data: train) {
     try {
 
-      this.where = `WHERE '${train_data.uniquefieldname}'='${train_data.uniquefield}'`
+      this.where = `WHERE "${train_data.uniquefieldname}"='${train_data.uniquefield}'`
 
       const train = await this.select(this.table, train_data.field, this.where, '', '');
 

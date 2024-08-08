@@ -4,7 +4,7 @@ import station_obj from "../model/dbstation"
 export const searchStation = async (req: Request, res: Response) => {
     try {
         const { station_name_or_code, page } = req.body
-        const response = await station_obj.search_station({ station_name_or_code }, "stn_name", page);
+        const response = await station_obj.search_station({ station_name_or_code }, "id , stn_name", page);
         if (!response || response.error) {
             throw {
                 message: response?.message || "your model function is not working"

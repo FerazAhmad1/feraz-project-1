@@ -37,8 +37,10 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     }
     req.body.__user = dbuser[0];
 
+    console.log("RRRRRRRRRRRRRRRRRRRRRRRR", req.body.__user, req.originalUrl)
     next();
   } catch (error) {
+    console.log(req.body, "PPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
     const err = error as any;
     res.status(400).json({
       error: true,
@@ -218,9 +220,11 @@ export const validate_body = (schema: any) => {
     try {
       const validate = await applyValidation(schema, req.body);
       req.body = { ...req.body, ...validate };
+      console.log("fwerjdhshfsdfjsakjfaksskh", req.body)
       next();
     } catch (error) {
       const err = error as any;
+      console.log(err, "qwertyeytrtru")
       res.status(400).json({
         error: true,
         message: err.message,
@@ -259,7 +263,7 @@ export const send_otp = async (otp: any, reciever: any) => {
 export const create_insert_many_query = (table: string, data: any[]) => {
   const column = Object.keys(data[0]);
   const columnNames = column.join(',')
-  console.log(columnNames, "columnNames")
+
   const values = data.map((record) => {
 
     const valueList = column.map((col) => {
@@ -273,7 +277,7 @@ export const create_insert_many_query = (table: string, data: any[]) => {
     return `(${valueList})`
 
   }).join(',')
-  const query = `INSERT INTO ${table} (${columnNames}) VALUES ${values}`
+  const query = `INSERT INTO ${table} (${columnNames}) VALUES ${values} RETURNING id`
   return query
 }
 

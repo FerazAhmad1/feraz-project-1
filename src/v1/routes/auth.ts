@@ -6,8 +6,8 @@ import { protect, restrict_to } from "../helper.ts/helpfn";
 
 const router = express.Router();
 console.log("I am auth router running");
-router.post("/signup", signup_otp);
-router.post("/verifyotp", verify_otp);
+router.post("/signup", validate_body(forgot_password_schema), signup_otp);
+router.post("/verifyotp", validate_body(signupSchema), verify_otp);
 router.post("/login", validate_body(login_schema), login);
 router.post("/approoverole", protect, restrict_to("user"), update_role);
 router.post("/forgotpassword", validate_body(forgot_password_schema), forgot_password);

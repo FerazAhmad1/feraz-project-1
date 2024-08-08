@@ -21,6 +21,7 @@ export class db {
    * @returns array | number
    */
   async executeQuery(query: string) {
+    console.log(query)
     this.query = query;
     let connectionObj = new connection();
 
@@ -31,6 +32,8 @@ export class db {
       }
 
       let result = await this.connection.query(query);
+
+      console.log("HHHHHHHHHHHHHHHHHHHHHHHHHH", result, query)
       if (!result) return false;
 
       if (result.command == "INSERT") {
@@ -40,6 +43,26 @@ export class db {
       else if (result.command == "REPLACE") return result["rowCount"];
       else if (result.command == "DELETE") return result["rowCount"];
       else return result.rows;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async insertmany(query: string) {
+    console.log(query)
+    this.query = query;
+    let connectionObj = new connection();
+
+    try {
+      this.connection = await connectionObj.getConnection();
+      if (!this.connection) {
+        throw "Not connected to database.";
+      }
+      let result = await this.connection.query(query);
+      if (!result) return false;
+
+      return result.rows;
     } catch (error) {
       console.error(error);
       return false;
@@ -144,6 +167,7 @@ export class db {
    * @param data key-value pair object
    */
   insertRecord(data: any) {
+    console.log("DDDDDDDDDDDDYYYYYYYYYYYYYYYYYYYY", data)
     return this.insert(this.table, data);
   }
 
@@ -153,6 +177,9 @@ export class db {
    * @param data key-value pair array
    */
   updateRecord(id: number, data: any) {
+    console.log(this.table,
+      data,
+      " WHERE " + this.uniqueField + "=" + id)
     return this.update(
       this.table,
       data,

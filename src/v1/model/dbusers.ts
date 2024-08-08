@@ -52,9 +52,19 @@ export class dbusers extends appdb {
       throw error;
     }
   }
+
   async update_user(id: number, data: any) {
     try {
-      return await this.updateRecord(id, data);
+      const setClauses = Object.entries(data).map(([key, value]) => {
+        if (value === null) {
+          return `${key} = NULL`;
+        } else {
+          return `${key} = '${value}'`;
+        }
+      }).join(', ');
+      this.where = `WHERE id = '${id}'`
+      const query = `UPDATE ${this.table} SET ${setClauses} ${this.where} `
+      return this.executeQuery(query);
     } catch (error) {
       throw error;
     }
@@ -151,8 +161,8 @@ export class dbusers extends appdb {
           message: "otp has been expire",
         };
       }
-
-      if (validate.otp !== dbotp) {
+      console.log(db_user)
+      if (validate.otp * 1 !== dbotp) {
         throw {
           message: "Incorrect otp",
         };
@@ -167,7 +177,7 @@ export class dbusers extends appdb {
       } = validate;
       const id = db_user[0].id;
       const hashed_password = await bcrypt.hash(password, 12);
-      const updateUser = await user.update_user(id, {
+      const updateUser = await user.update_user(id * 1, {
         firstname,
         lastname,
         password: hashed_password,

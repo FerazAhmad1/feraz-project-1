@@ -17,7 +17,7 @@ class dbschedule extends appdb {
     async get_schedule(schedule_data: schedule_col) {
         const { station_id, train_id, fields } = schedule_data
         this.where = `WHERE station_id = '${station_id}' AND train_id = '${train_id}' `
-        return this.select(this.table, fields, this.where, '', '20')
+        return this.select(this.table, fields, this.where, '', `LIMIT ${this.rpp}`)
     }
 
     async get_trains_from_source_to_destination(from_station_id: any, to_station_id: any, field: string, page: number) {

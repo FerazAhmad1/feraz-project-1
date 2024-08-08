@@ -9,6 +9,7 @@ export const signup_otp = async (req: Request, res: Response) => {
         message: response?.message || "your model function is not working"
       }
     }
+    res.status(200).json(response)
   } catch (error) {
     const err = error as any;
     res.status(400).json({

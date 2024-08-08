@@ -31,6 +31,7 @@ class dbreservetickets extends appdb {
 
   async insert_reserve_ticket(data: any) {
     try {
+
       return await this.insertRecord(data);
     } catch (error) {
       throw error;
@@ -39,7 +40,7 @@ class dbreservetickets extends appdb {
 
   async update_reserve_ticket(id: any, data: any) {
     try {
-      console.log("update reserve ticket", id, data);
+
       return await this.updateRecord(id, data);
     } catch (error) {
       throw error;
@@ -48,19 +49,19 @@ class dbreservetickets extends appdb {
 
   async get_rserve_ticket(data: reserve_ticket_type) {
     const { uniquefield, uniquefieldname, field } = data
-    this.where = `WHERE '${uniquefieldname}'='${uniquefield}'`
+    this.where = `WHERE "${uniquefieldname}"='${uniquefield}'`
 
     return this.select(this.table, field, this.where, '', '20')
   }
 
-  async ticket_reservation(request_body: any, userid: any) {
+  async ticket_reservation(request_body: any, user: any) {
 
     try {
 
       const validate = { ...request_body }
 
       // find train source station and destination station
-      const train_query = train_obj.get_train({ uniquefieldname: 'trainnumber', uniquefield: validate.trainnumber, field: "*" });
+      const train_query = train_obj.get_train({ uniquefieldname: "t_number", uniquefield: validate.trainnumber, field: "*" });
 
 
       // find station source and destination 
@@ -72,6 +73,7 @@ class dbreservetickets extends appdb {
 
       const [[train], [source_station], [destination_station]] = await Promise.all([train_query, source_station_query, destination_station_query,]);
 
+
       // validate train if it runs beatween selected stations
       const source_station_id = source_station.id;
 
@@ -81,9 +83,9 @@ class dbreservetickets extends appdb {
 
       // find schedule as per station and train for both source and destination
 
-      const source_schedule_query = schedule_obj.get_schedule({ train_id, station_id: source_station_id, fields: " id,stop_order,minutes " })
+      const source_schedule_query = schedule_obj.get_schedule({ train_id, station_id: source_station_id, fields: " id,stop_order,minutes_required_to_reach_from_source_station as minutes" })
 
-      const destination_schedule_query = schedule_obj.get_schedule({ train_id, station_id: destination_station_id, fields: " id,stop_order,minutes " })
+      const destination_schedule_query = schedule_obj.get_schedule({ train_id, station_id: destination_station_id, fields: " id,stop_order,minutes_required_to_reach_from_source_station as minutes" })
 
       const [[source_schedule], [destination_schedule]] = await Promise.all([source_schedule_query, destination_schedule_query,]);
 
@@ -133,8 +135,11 @@ class dbreservetickets extends appdb {
 
       // count number of ticket already reserved
 
-      let [{ cnt: count }] = await this.count_ticket_in_a_train_at_specified_date(formated_train_date, train_id, 1);
+      let count = await this.count_ticket_in_a_train_at_specified_date(formated_train_date, train_id, 1);
+
+
       count = count * 1;
+
       if (count >= 250) {
         throw {
           message: "Not available",
@@ -182,39 +187,42 @@ class dbreservetickets extends appdb {
         pincode,
         state,
         pnr,
-        userid,
+        userid: user.id,
         source_date: formated_train_date,
         train_id,
         start_schedule: source_schedule.id,
         end_schedule: destination_schedule.id,
       };
 
-      console.log("Ticket-entry-data", ticket_entry_data);
+
       const reservation_ticket_id = await this.insert_reserve_ticket(ticket_entry_data);
+
+
 
       // insert customers in customer table
 
 
-      const customer = validate.customers.map(({ first_name, last_name, dob }: any) => {
+      const customer = validate.customers.map(({ firstname, lastname, dob }: any) => {
         return {
-          first_name,
-          last_name,
+          firstname,
+          lastname,
           role: "customer",
           dob: formatDateString(dob, "YYYY-MM-DD HH:mm:ss"),
         }
       })
 
-      const query_for_Insert_Many = create_insert_many_query(this.table, customer)
+      const query_for_Insert_Many = create_insert_many_query("users", customer)
 
-      const customer_response = await this.executeQuery(query_for_Insert_Many);
+      const customer_response = await this.insertmany(query_for_Insert_Many);
 
       const start = count + 1
+
       const all_seat: any[] = []
 
-      const insert_response_customer_ticket = await Promise.all(customer_response.map((id: any, i: number) => {
+      const insert_response_customer_ticket = await Promise.all(customer_response.map((customer: any, i: number) => {
         const seat_number = start + i
         all_seat.push(seat_number)
-        return customer_ticket_obj.insert_customer_ticket({ seat_number, customerid: id, ticketid: reservation_ticket_id })
+        return customer_ticket_obj.insert_customer_ticket({ seat_number, customerid: customer.id, ticketid: reservation_ticket_id })
       }))
 
       const data = {
@@ -234,6 +242,7 @@ class dbreservetickets extends appdb {
         data,
         message: "this is your ticket"
       }
+
 
     } catch (error) {
 
@@ -266,7 +275,7 @@ class dbreservetickets extends appdb {
         const response = await this.update_reserve_ticket(ticket[0].id, {
           status: "0",
         });
-        console.log(response);
+
         if (!response) {
           throw {
             message: "Internal server error",
