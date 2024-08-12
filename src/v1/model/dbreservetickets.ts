@@ -59,6 +59,23 @@ class dbreservetickets extends appdb {
 
       const [[train], [source_station], [destination_station]] = await Promise.all([train_query, source_station_query, destination_station_query,]);
 
+      if (!train) {
+        throw {
+          message: "Invalid train number"
+        }
+      }
+
+      if (!source_station) {
+        throw {
+          message: "Invalid from_id.no station found"
+        }
+      }
+
+      if (!destination_station) {
+        throw {
+          message: "Invalid to_id.no station found"
+        }
+      }
 
       // validate train if it runs beatween selected stations
       const source_station_id = source_station.id;
@@ -182,7 +199,11 @@ class dbreservetickets extends appdb {
 
 
       const reservation_ticket_id = await this.insertRecord(ticket_entry_data);
-
+      if (!reservation_ticket_id) {
+        throw {
+          message: "error coming from insert reservation ticket"
+        }
+      }
 
 
       // insert customers in customer table
@@ -200,6 +221,11 @@ class dbreservetickets extends appdb {
       const query_for_Insert_Many = create_insert_many_query("users", customer)
 
       const customer_response = await this.insertmany(query_for_Insert_Many);
+      if (!customer_response) {
+        throw {
+          message: "error coming is during inserting customer in user table"
+        }
+      }
 
       const start = count + 1
 

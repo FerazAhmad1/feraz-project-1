@@ -77,33 +77,6 @@ export const create_date = function (date: any, time: string, minutes_to_add: nu
   return [formatedDate, formatedTime];
 };
 
-export const check_timeLimit = function (dateStr: any, timeStr: any) {
-  try {
-    const initialDate: any = new Date(dateStr);
-    const [hours, minutes, seconds] = timeStr.split(":").map(Number);
-    initialDate.setHours(hours, minutes, seconds);
-    if (initialDate > new Date()) {
-      const current_date = new Date() as any;
-      let difference = (initialDate - current_date) / (1 * 60 * 60 * 1000);
-      console.log(difference);
-      if (difference >= 4) return true;
-      else {
-        throw {
-          message:
-            "you can only get the ticket before three hours of train departure from source station",
-        };
-      }
-    }
-
-    throw {
-      message: "train  has been left source station",
-    };
-  } catch (error) {
-    const err = error as any;
-    console.log(err.message);
-    throw err;
-  }
-};
 
 export const restrict_to = function (...allowed: any[]) {
   console.log();
